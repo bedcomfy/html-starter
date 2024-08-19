@@ -40,6 +40,7 @@
 let selected_device;
 const devices = [];
 let printLogo = false; // State to track whether to print the logo
+let amazonFreshLogoZPL = ''; // Variable to hold the logo ZPL
 
 const addDeviceToList = (device) => {
     devices.push(device);
@@ -72,34 +73,27 @@ const getConfig = () => {
     );
 };
 
+const loadLogoZPL = async () => {
+    try {
+        const response = await fetch('amazonFreshLogo.zpl');
+        if (!response.ok) throw new Error('Network response was not ok');
+        amazonFreshLogoZPL = await response.text();
+    } catch (error) {
+        console.error('Error loading logo ZPL:', error);
+    }
+};
+
 const loadLogo = () => {
-    const logoCommand = `^XA` + // Start label format
-                        `^FO50,50` + // Position the logo (adjust as needed)
-                        `^XFR:FRESH.PCX^FS` + // Load the PCX image
-                        `^XZ`; // End label format
+    const logoCommand = `^XA^FO50,50^XFR:FRESH.PCX^FS^XZ`;
     selected_device.send(logoCommand, undefined, errorCallback);
 };
 
-const amazonFreshLogoZPL = `^XA
-^FO0,0^GFA,17300,17300,100,,::::::::::::::::::::::::::::::::::::::::::::::::::::kO07FEg03F,kN01IFg07F,kN03IFg07F,kN07IFg07F,kN0JFg07F,kN0FF83g07F,kN0FFgH07F,kN0FEgH07F,kM01FEgH07F,kM01FCgH07F,:::kM01FCQ048K048007FI04,kM01FEL03C007FF8I07FF807F03FF8,iH01FFL0F801EJ03FEQ0F8K01FI01KF0FC1FE01IFE001JF07F0IFC,iH07FFE007E3FE07FC001IF800JFE007FF001FC7FC003KF0FC3FE03JF003JF07F3IFE,iG01JF007F7FF0FFE003IFE00JFE00IF801FCFFE003KF0FEFFE07JF807JF07LF,iG03JF807F7FF9IF007JF00JFE03IFE01FDFFE003KF0JFE0KF80KF07LF,iG07JF807JFBIF00KF00JFE03IFE01KF003JFE0JFE1FE03FC0FF01F07FFC1FF8,iG07JFC07NF01KF80JFE07JF01KFI01FEI0JFC3FC01FC1FCJ07FE00FF8,iG0FF83FC07NF81FE0FF80JFE0FF8FF81KF8001FCI0FFC003F800FE1FCJ07F8007F8,iG0FF03FC07FC7FF8FF81FC07F8I07FC0FF07F81FF9FF8001FEI0FFI07FI0FE1FCJ07FI07F8,iG0FE01FC07F83FF07F81FC07F8I0FF81FE03FC1FF07F8001FEI0FEI07FI0FE1FCJ07FI03F8,iG01C01FC07F81FE07F807807F8I0FF81FE03FC1FE07F8001FEI0FEI07EI0FE1FEJ07FI03F8,iJ01FC07F01FE07F8J07F8001FF01FE03FC1FE07F8001FEI0FEI07E001FE0FFJ07FI03F8,iJ01FC07F01FC07F8J07F8003FE01FC01FC1FC07F8001FEI0FEI0FE003FC0FFCI07FI03F8,iI0IFC07F01FC07F8001IF8003FE03FC01FE1FC07F8001FEI0FEI0LFC07FF8007FI03F8,iH07IFC07F01FC07F801JF8007FC03FC01FE1FC07F8001FEI0FEI0LF807IF007FI03F8,iG01JFC07F01FC07F803JF800FF803FC01FE1FC07F8001FEI0FEI0LF001IFC07FI03F8,iG03JFC07F01FC07F80KF800FF803FC01FE1FC07F8001FEI0FEI0KFEI0IFE07FI03F8,iG07FE1FC07F01FC07F81FF87F801FF003FC01FE1FC07F8001FEI0FEI0KF8I01IF07FI03F8,iG0FF81FC07F01FC07F81FE07F803FE003FC01FE1FC07F8001FEI0FEI0FE11L07FF87FI03F8,iG0FF01FC07F01FC07F83FC07F807FC003FC01FE1FC07F8001FEI0FEI0FEO0FF87FI03F8,i01FE01FC07F01FC07F83FC07F807FC001FE01FC1FC07F8001FEI0FEI0FEO03F87FI03F8,i01FE01FC07F01FC07F83FC07F80FF8001FE01FC1FC07F8001FEI0FEI07FO03FC7FI03F8,i01FE03FE07F01FC07F87FC07F81IFE01FE03FC1FC07F8001FEI0FEI07FO01FC7FI03F8,i01FE03FE07F01FC07F87FC07FC1JFC1FE03FC1FC07F8001FEI0FEI07F8N01FC7FI03F8,i01FE07FE07F01FC07F83FC0FFC1JFE0FF07F81FC07F8001FEI0FEI03FCN01FC7FI03F8,i01FF0IF07F01FC07F83FE1FFE3KF0FF87F81FC07F8001FEI0FEI03FEI0818003F87FI03F8,i01LF87F01FC07F83KFE3KF07JF01FC07F8001FEI0FEI01FFC0FC1F80FF87FI03F8,iG0LF07F01FC07F83KFE3KF07JF01FC07F8001FEI0FEI01KFC1KF07FI03F8,iG0IFEFE07F01FC07F81IFDFC3FF3FF03IFE01FC07F8001FEI0FEJ0KFC1KF07FI03F8,iG07FFC7C07F01FE07F80IF8F83EI0F01IFC01FC07F8001FEI0FEJ07JF81JFE07FI03F8,iG03FF83807F01FC07F807FE0F01J02007FF001FC07F8001FCI0FEJ01JF80JF807FI03F8,iH07C01S01F802O01FCL017K08P07FFC001FFE,jN0E,jL01FFE,iM08X0JF,iM0EW01JF,iM0F8V01803F,iM03EY01F,iM01F8X01E,iN0FEW021E,iN07F8U01F1E,iN01FFU0FE1E,iO0FFES07FC1C,iO03FFEQ03FF83C,iP0IFEO03FFE038,iP07JFM07IF8038,iP01LFI0KFE007,iQ07SF8006,iR0RFEI0C,iR01QF,iS03OF8,iT07MF8,iU03KF,,::::::::::::::::::::::::::::::::::::::::::::::::::::^FS
-^XZ`;
-
 const printBarcode = (text) => {
-    const zplCommand = `^XA` + // Start label format
-                       `^PW400` + // Set print width to 400 dots (4 inches)
-                       `^LL300` + // Set label length to 300 dots (3 inches)
-                       `^MD100` + // Set darkness level to 100
-                       `^PR3` + // Set print speed to 3
-                       (printLogo ? amazonFreshLogoZPL : '') + // Include Amazon Fresh logo ZPL if toggled
-                       `^FO0,0` + // Position for barcode (default position)
-                       `^BCN,100,Y,N,N,N,D` + // Barcode type Code128, height set to 100
-                       `^FD${text}^FS` + // Field data (barcode content)
-                       `^XZ`; // End label format
+    const zplCommand = `^XA^PW400^LL300^MD100^PR3` +
+                       (printLogo ? amazonFreshLogoZPL : '') +
+                       `^FO0,0^BCN,100,Y,N,N,N,D^FD${text}^FS^XZ`;
     selected_device.send(zplCommand, undefined, errorCallback);
 };
-
-
-
 
 const sendCustomZPL = () => {
     const customZPL = document.getElementById('customZPLInput').value;
@@ -115,82 +109,46 @@ const onDeviceSelected = (selected) => {
 };
 
 const toggleLogo = () => {
-    printLogo = !printLogo; // Toggle the logo state
+    printLogo = !printLogo;
     alert(`Fresh Logo will ${printLogo ? 'be printed' : 'not be printed'}.`);
 };
 
-window.onload = () => {
-    setup();
-    loadLogo(); // Load the logo into printer memory on page load
+const createInputGroup = (labelText, inputType, inputId, placeholder, defaultValue) => {
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group';
+    inputGroup.innerHTML = `
+        <label>${labelText}</label>
+        <input type="${inputType}" placeholder="${placeholder}" value="${defaultValue}" id="${inputId}">
+    `;
+    document.body.appendChild(inputGroup);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+const setupEventListeners = () => {
     document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
     document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
     
-    // New input fields for barcode printing settings with labels
-    const barcodeLabel = document.createElement('label');
-    barcodeLabel.textContent = 'Enter text for barcode:';
-    document.body.appendChild(barcodeLabel);
-    
-    const barcodeInput = document.createElement('input');
-    barcodeInput.type = 'text';
-    barcodeInput.placeholder = 'Enter text';
-    document.body.appendChild(barcodeInput);
-
     const printButton = document.createElement('input');
     printButton.type = 'button';
     printButton.value = 'Print Barcode';
     printButton.addEventListener('click', () => {
-        const text = barcodeInput.value;
-        const darkness = darknessInput.value;
-        const speed = speedInput.value;
-        const size = sizeInput.value;
-
+        const text = document.getElementById('barcodeInput').value;
         if (text) {
-            printBarcode(text, darkness, speed, size);
+            printBarcode(text);
         } else {
             alert("Please enter text for the barcode.");
         }
     });
     document.body.appendChild(printButton);
 
-    // Parameter inputs with labels aligned next to their corresponding input boxes
-    const darknessInputGroup = document.createElement('div');
-    darknessInputGroup.className = 'input-group';
-    darknessInputGroup.innerHTML = `
-        <label>Darkness (0-100):</label>
-        <input type="number" placeholder="70" value="70" id="darknessInput">
-    `;
-    document.body.appendChild(darknessInputGroup);
-
-    const speedInputGroup = document.createElement('div');
-    speedInputGroup.className = 'input-group';
-    speedInputGroup.innerHTML = `
-        <label>Speed (1-6):</label>
-        <input type="number" placeholder="3" value="3" id="speedInput">
-    `;
-    document.body.appendChild(speedInputGroup);
-
-    const sizeInputGroup = document.createElement('div');
-    sizeInputGroup.className = 'input-group';
-    sizeInputGroup.innerHTML = `
-        <label>Size (1-200):</label>
-        <input type="number" placeholder="150" value="150" id="sizeInput">
-    `;
-    document.body.appendChild(sizeInputGroup);
-
-    // Checkbox for toggling the Fresh Logo
     const logoToggle = document.getElementById('logoToggle');
     logoToggle.addEventListener('change', () => {
-        printLogo = logoToggle.checked; // Update printLogo based on checkbox state
+        printLogo = logoToggle.checked;
     });
 
-    // New input area for custom ZPL commands
     const customZPLLabel = document.createElement('label');
     customZPLLabel.textContent = 'Enter Custom ZPL Command:';
     document.body.appendChild(customZPLLabel);
-    
+
     const customZPLInput = document.createElement('textarea');
     customZPLInput.id = 'customZPLInput';
     customZPLInput.placeholder = 'Enter your ZPL command here...';
@@ -201,7 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
     sendZPLButton.value = 'Send ZPL Command';
     sendZPLButton.addEventListener('click', sendCustomZPL);
     document.body.appendChild(sendZPLButton);
-});
+};
+
+window.onload = async () => {
+    await loadLogoZPL(); // Load the logo ZPL when the page loads
+    setup();
+    loadLogo();
+    setupEventListeners(); // Set up all event listeners
+};
 </script>
 </head>
 <body>
@@ -215,3 +180,4 @@ document.addEventListener('DOMContentLoaded', () => {
         <input type="checkbox" id="logoToggle"> Print Fresh Logo
     </label>
 </body>
+</html>
