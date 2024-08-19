@@ -16,22 +16,25 @@
         margin-bottom: 20px;
     }
     .input-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin: 10px 0;
+    }
+    .input-group label {
+        margin-right: 10px;
     }
     .parameter-inputs {
         display: flex;
-        justify-content: center;
         flex-direction: column;
         align-items: center;
-    }
-    .parameter-inputs input {
-        margin: 5px;
     }
 </style>
 <script type="text/javascript" src="../BrowserPrint-3.1.250.min.js"></script>
 <script type="text/javascript">
 let selected_device;
 const devices = [];
+let printLogo = false; // State to track whether to print the logo
 
 const addDeviceToList = (device) => {
     devices.push(device);
@@ -65,11 +68,13 @@ const getConfig = () => {
 };
 
 const printBarcode = (text, darkness, speed, size) => {
+    const logoCommand = printLogo ? `^FO50,10^XFR:fresh.png^FS` : ''; // Command to print logo if toggled
     const zplCommand = `^XA` + // Start label format
                        `^PW400` + // Set print width to 400 dots (4 inches)
                        `^LL300` + // Set label length to 300 dots (3 inches)
                        `^MD${darkness}` + // Set darkness level
                        `^PR${speed}` + // Set print speed
+                       logoCommand + // Include logo command if toggled
                        `^FO50,75` + // Centered X position (50 dots), Y position (75 dots)
                        `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
                        `^FD${text}^FS` + // Field data (barcode content)
@@ -83,6 +88,11 @@ const errorCallback = (errorMessage) => {
 
 const onDeviceSelected = (selected) => {
     selected_device = devices.find(device => selected.value == device.uid);
+};
+
+const toggleLogo = () => {
+    printLogo = !printLogo; // Toggle the logo state
+    alert(`Fresh Logo will ${printLogo ? 'be printed' : 'not be printed'}.`);
 };
 
 window.onload = setup;
@@ -118,42 +128,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.body.appendChild(printButton);
 
-    const darknessLabel = document.createElement('label');
-    darknessLabel.textContent = 'Darkness (0-100):';
-    document.body.appendChild(darknessLabel);
-    
-    const darknessInput = document.createElement('input');
-    darknessInput.type = 'number';
-    darknessInput.placeholder = '70';
-    darknessInput.value = '70'; // Default darkness
-    document.body.appendChild(darknessInput);
+    // Parameter inputs with labels aligned next to their corresponding input boxes
+    const darknessInputGroup = document.createElement('div');
+    darknessInputGroup.className = 'input-group';
+    darknessInputGroup.innerHTML = `
+        <label>Darkness (0-100):</label>
+        <input type="number" placeholder="70" value="70" id="darknessInput">
+    `;
+    document.body.appendChild(darknessInputGroup);
 
-    const speedLabel = document.createElement('label');
-    speedLabel.textContent = 'Speed (1-6):';
-    document.body.appendChild(speedLabel);
-    
-    const speedInput = document.createElement('input');
-    speedInput.type = 'number';
-    speedInput.placeholder = '3';
-    speedInput.value = '3'; // Default speed
-    document.body.appendChild(speedInput);
+    const speedInputGroup = document.createElement('div');
+    speedInputGroup.className = 'input-group';
+    speedInputGroup.innerHTML = `
+        <label>Speed (1-6):</label>
+        <input type="number" placeholder="3" value="3" id="speedInput">
+    `;
+    document.body.appendChild(speedInputGroup);
 
-    const sizeLabel = document.createElement('label');
-    sizeLabel.textContent = 'Size (1-200):';
-    document.body.appendChild(sizeLabel);
-    
-    const sizeInput = document.createElement('input');
-    sizeInput.type = 'number';
-    sizeInput.placeholder = '150';
-    sizeInput.value = '150'; // Default size
-    document.body.appendChild(sizeInput);
+    const sizeInputGroup = document.createElement('div');
+    sizeInputGroup.className = 'input-group';
+    sizeInputGroup.innerHTML = `
+        <label>Size (1-200):</label>
+        <input type="number" placeholder="150" value="150" id="sizeInput">
+    `;
+    document.body.appendChild(sizeInputGroup);
 
-    const parameterInputs = document.createElement('div');
-    parameterInputs.className = 'parameter-inputs';
-    parameterInputs.appendChild(darknessInput);
-    parameterInputs.appendChild(speedInput);
-    parameterInputs.appendChild(sizeInput);
-    document.body.appendChild(parameterInputs);
+    // Button to toggle the Fresh Logo
+    const logoButton = document.createElement('input');
+    logoButton.type = 'button';
+    logoButton.value = 'Toggle Fresh Logo';
+    logoButton.addEventListener('click', toggleLogo);
+    document.body.appendChild(logoButton);
 });
 </script>
 </head>
