@@ -37,10 +37,6 @@ const getConfig = () => {
     );
 };
 
-const writeToSelectedPrinter = (dataToWrite) => {
-    selected_device.send(dataToWrite, undefined, errorCallback);
-};
-
 const readCallback = (readData) => {
     if (!readData) {
         alert("No Response from Device");
@@ -61,19 +57,6 @@ const getDeviceCallback = (deviceList) => {
     alert("Devices: \n" + JSON.stringify(deviceList, null, 4));
 };
 
-const constructUrl = (fileUrl) => {
-    const url = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
-    return `${url}/${fileUrl}`;
-};
-
-const sendImage = (imageUrl) => {
-    selected_device.convertAndSendFile(constructUrl(imageUrl), undefined, errorCallback);
-};
-
-const sendFile = (fileUrl) => {
-    selected_device.sendFile(constructUrl(fileUrl), undefined, errorCallback);
-};
-
 const onDeviceSelected = (selected) => {
     selected_device = devices.find(device => selected.value == device.uid);
 };
@@ -83,18 +66,12 @@ window.onload = setup;
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
     document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
-    document.querySelector('input[value="Send Config Label"]').addEventListener('click', () => writeToSelectedPrinter('~wc'));
-    document.querySelector('input[value="Send ZPL Label"]').addEventListener('click', () => writeToSelectedPrinter('^XA^FO200,200^A0N36,36^FDTest Label^FS^XZ'));
     document.querySelector('input[value="Get Status"]').addEventListener('click', () => {
         writeToSelectedPrinter('~hs');
         readFromSelectedPrinter();
     });
     document.querySelector('input[value="Get Local Devices"]').addEventListener('click', () => BrowserPrint.getLocalDevices(getDeviceCallback, errorCallback));
-    document.querySelector('input[value="Write"]').addEventListener('click', () => writeToSelectedPrinter(document.getElementById('write_text').value));
     document.querySelector('input[value="Read"]').addEventListener('click', readFromSelectedPrinter);
-    document.querySelector('input[value="Send BMP"]').addEventListener('click', () => sendImage('Zebra_logobox.bmp'));
-    document.querySelector('input[value="Send JPG"]').addEventListener('click', () => sendImage('ZebraGray.jpg'));
-    document.querySelector('input[value="Send File"]').addEventListener('click', () => sendFile('wc.zpl'));
 });
 </script>
 </head>
@@ -104,14 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <span style="font-size:75%">This page must be loaded from a web server to function properly.</span><br><br>
 Selected Device: <select id="selected_device"></select> <br/><br/> 
 <input type="button" value="Get Application Configuration"><br/><br/>
-<input type="button" value="Send Config Label"><br/><br/>
-<input type="button" value="Send ZPL Label"><br/><br/>
 <input type="button" value="Get Status"><br/><br/>
 <input type="button" value="Get Local Devices"><br/><br/>
-<input type="text" name="write_text" id="write_text"><input type="button" value="Write"><br/><br/>
 <input type="button" value="Read"><br/><br/>
-<input type="button" value="Send BMP"><br/><br/>
-<input type="button" value="Send JPG"><br/><br/>
-<input type="button" value="Send File"><br/><br/>
 </body>
 </html>
