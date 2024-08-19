@@ -16,7 +16,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         } else {
+            // Handle the case where devices is not an array
             console.error('Devices is not an array:', devices);
+            for (const key in devices) {
+                if (devices.hasOwnProperty(key)) {
+                    const device = devices[key];
+                    if (device.deviceType === 'printer') {
+                        console.log('Printer detected:', device);
+                        const option = document.createElement('option');
+                        option.value = device.uid;
+                        option.textContent = device.name;
+                        printerSelect.appendChild(option);
+                    }
+                }
+            }
         }
     }, function(error) {
         console.error('Error getting devices:', error);
