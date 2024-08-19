@@ -27,6 +27,8 @@
 <script type="text/javascript" src="../BrowserPrint-3.1.250.min.js"></script>
 <script type="text/javascript">
 let selected_device;
+let printLogo = false; // State to track whether to print the logo
+let amazonFreshLogoZPL = ''; // Variable to hold the logo ZPL
 
 const setup = () => {
     BrowserPrint.getDefaultDevice("printer", device => {
@@ -35,10 +37,20 @@ const setup = () => {
     }, error => alert(error));
 };
 
+const loadLogoZPL = async () => {
+    try {
+        const response = await fetch('amazonFreshLogo.zpl');
+        if (!response.ok) throw new Error('Network response was not ok');
+        amazonFreshLogoZPL = await response.text();
+    } catch (error) {
+        console.error('Error loading logo ZPL:', error);
+    }
+};
+
 const printBarcode = () => {
     const text = document.getElementById('barcodeInput').value;
     if (text) {
-        const zplCommand = `^XA^FO50,50^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
+        const zplCommand = `^XA${printLogo ? amazonFreshLogoZPL : ''}^FO50,50^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
         selected_device.send(zplCommand, undefined, errorCallback);
     } else {
         alert("Please enter text for the barcode.");
@@ -47,17 +59,22 @@ const printBarcode = () => {
 
 const sendCustomZPL = () => {
     const customZPL = document.getElementById('customZPLInput').value;
-    selected_device.send(customZPL, undefined, errorCallback);
+    const zplCommand = `^XA${printLogo ? amazonFreshLogoZPL : ''}${customZPL}^XZ`;
+    selected_device.send(zplCommand, undefined, errorCallback);
 };
 
 const errorCallback = (errorMessage) => {
     alert("Error: " + errorMessage);
 };
 
-window.onload = () => {
+window.onload = async () => {
+    await loadLogoZPL(); // Load the logo ZPL when the page loads
     setup();
     document.getElementById('printButton').addEventListener('click', printBarcode);
     document.getElementById('sendZPLButton').addEventListener('click', sendCustomZPL);
+    document.getElementById('logoToggle').addEventListener('change', () => {
+        printLogo = document.getElementById('logoToggle').checked;
+    });
 };
 </script>
 </head>
@@ -74,6 +91,12 @@ window.onload = () => {
     <div class="input-group">
         <label for="customZPLInput">Enter Custom ZPL Command:</label>
         <textarea id="customZPLInput" placeholder="Enter your ZPL command here..."></textarea>
+    </div>
+
+    <div class="input-group">
+        <label for="logoToggle">
+            <input type="checkbox" id="logoToggle"> Print Amazon Fresh Logo
+        </label>
     </div>
 
     <div class="input-group">
