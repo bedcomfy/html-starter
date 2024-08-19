@@ -38,12 +38,12 @@ const getConfig = () => {
 };
 
 const printBarcode = (text) => {
-    const cpclCommand = `! 0 200 200 210 1\r\n` + // Set label size
-                        `FORM\r\n` + // Start form
-                        `CENTER 0\r\n` + // Center the barcode
-                        `BARCODE 0 1 0 2 2 20 0 "${text}"\r\n` + // Print barcode
-                        `PRINT\r\n`; // Execute print
-    selected_device.send(cpclCommand, undefined, errorCallback);
+    const zplCommand = `^XA` + // Start label format
+                       `^FO50,50` + // Field origin (x,y)
+                       `^BCN,100,Y,N,N,N,D` + // Barcode type Code128, height 100
+                       `^FD${text}^FS` + // Field data (barcode content)
+                       `^XZ`; // End label format
+    selected_device.send(zplCommand, undefined, errorCallback);
 };
 
 const errorCallback = (errorMessage) => {
