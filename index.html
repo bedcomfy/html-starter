@@ -50,7 +50,14 @@ const loadLogoZPL = async () => {
 const printBarcode = () => {
     const text = document.getElementById('barcodeInput').value;
     if (text) {
-        const zplCommand = `^XA${printLogo ? amazonFreshLogoZPL : ''}^FO50,150^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
+        let zplCommand = '^XA';
+        if (printLogo) {
+            zplCommand += amazonFreshLogoZPL;
+            zplCommand += '^FO50,150'; // Adjust the position of the barcode below the logo
+        } else {
+            zplCommand += '^FO50,50'; // Position the barcode at the top if the logo is not printed
+        }
+        zplCommand += `^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
         selected_device.send(zplCommand, undefined, errorCallback);
     } else {
         alert("Please enter text for the barcode.");
@@ -59,7 +66,11 @@ const printBarcode = () => {
 
 const sendCustomZPL = () => {
     const customZPL = document.getElementById('customZPLInput').value;
-    const zplCommand = `^XA${printLogo ? amazonFreshLogoZPL : ''}${customZPL}^XZ`;
+    let zplCommand = '^XA';
+    if (printLogo) {
+        zplCommand += amazonFreshLogoZPL;
+    }
+    zplCommand += customZPL + '^XZ';
     selected_device.send(zplCommand, undefined, errorCallback);
 };
 
