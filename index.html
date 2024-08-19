@@ -74,7 +74,7 @@ const getConfig = () => {
 
 const loadLogo = () => {
     const logoCommand = `^XA` + // Start label format
-                        `^FO50,50` + // Position the logo
+                        `^FO50,50` + // Position the logo (adjust as needed)
                         `^XFR:FRESH.PCX^FS` + // Load the PCX image
                         `^XZ`; // End label format
     selected_device.send(logoCommand, undefined, errorCallback);
@@ -88,7 +88,7 @@ const printBarcode = (text, darkness, speed, size) => {
                        `^MD${darkness}` + // Set darkness level
                        `^PR${speed}` + // Set print speed
                        logoCommand + // Include logo command if toggled
-                       `^FO50,75` + // Centered X position (50 dots), Y position (75 dots)
+                       `^FO50,150` + // Adjust Y position for barcode (50 dots from left, 150 dots from top)
                        `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
                        `^FD${text}^FS` + // Field data (barcode content)
                        `^XZ`; // End label format
@@ -175,12 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.body.appendChild(sizeInputGroup);
 
-    // Button to toggle the Fresh Logo
-    const logoButton = document.createElement('input');
-    logoButton.type = 'button';
-    logoButton.value = 'Toggle Fresh Logo';
-    logoButton.addEventListener('click', toggleLogo);
-    document.body.appendChild(logoButton);
+    // Checkbox for toggling the Fresh Logo
+    const logoToggle = document.getElementById('logoToggle');
+    logoToggle.addEventListener('change', () => {
+        printLogo = logoToggle.checked; // Update printLogo based on checkbox state
+    });
 
     // New input area for custom ZPL commands
     const customZPLLabel = document.createElement('label');
@@ -201,10 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </head>
 <body>
+    <h1>Zebra Browser Print Test Page</h1>
+    <h2>This page must be loaded from a web server to function properly.</h2>
+    Selected Device: <select id="selected_device"></select> <br/><br/> 
+    <input type="button" value="Get Application Configuration"><br/><br/>
 
-<h1>Zebra Browser Print Test Page</h1>
-<h2>This page must be loaded from a web server to function properly.</h2>
-Selected Device: <select id="selected_device"></select> <br/><br/> 
-<input type="button" value="Get Application Configuration"><br/><br/>
+    <!-- Checkbox for toggling the Fresh Logo -->
+    <label>
+        <input type="checkbox" id="logoToggle"> Print Fresh Logo
+    </label>
 </body>
-</html>
