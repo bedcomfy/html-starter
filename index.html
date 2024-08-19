@@ -39,7 +39,8 @@ const getConfig = () => {
 
 const printBarcode = (text) => {
     const cpclCommand = `! 0 200 200 210 1\r\n` +
-                        `BARCODE 50 1 0 2 2 20 0 "${text}"\r\n` +
+                        `CENTER 0\r\n` + // Center the barcode
+                        `BARCODE 0 1 0 2 2 20 0 "${text}"\r\n` +
                         `PRINT\r\n`;
     selected_device.send(cpclCommand, undefined, errorCallback);
 };
