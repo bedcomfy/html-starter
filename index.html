@@ -50,7 +50,7 @@ const loadLogoZPL = async () => {
 const printBarcode = () => {
     const text = document.getElementById('barcodeInput').value;
     if (text) {
-        const zplCommand = `^XA${printLogo ? amazonFreshLogoZPL : ''}^FO50,50^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
+        const zplCommand = `^XA${printLogo ? amazonFreshLogoZPL : ''}^FO50,150^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
         selected_device.send(zplCommand, undefined, errorCallback);
     } else {
         alert("Please enter text for the barcode.");
