@@ -73,23 +73,24 @@ const getConfig = () => {
 };
 
 const loadLogo = () => {
-    const logoCommand = `^XA^XFRESHLOGO.BMP^FS^XZ`; // Load the image into memory
+    const logoCommand = `! 0 200 200 210 1\r\n` + // CPCL command to set up the image
+                        `PAGE-WIDTH 400\r\n` + // Set page width
+                        `TEXT 0 0 0 1 "Loading Fresh Logo..."\r\n` + // Placeholder text
+                        `PUTFILE "fresh.pcx" 0 0\r\n` + // Load the PCX image
+                        `PRINT\r\n`; // Print command
     selected_device.send(logoCommand, undefined, errorCallback);
 };
 
 const printBarcode = (text, darkness, speed, size) => {
-    const logoCommand = printLogo ? `^FO50,10^XFR:freshlogo.bmp^FS` : ''; // Command to print logo if toggled
-    const zplCommand = `^XA` + // Start label format
-                       `^PW400` + // Set print width to 400 dots (4 inches)
-                       `^LL300` + // Set label length to 300 dots (3 inches)
-                       `^MD${darkness}` + // Set darkness level
-                       `^PR${speed}` + // Set print speed
-                       logoCommand + // Include logo command if toggled
-                       `^FO50,75` + // Centered X position (50 dots), Y position (75 dots)
-                       `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
-                       `^FD${text}^FS` + // Field data (barcode content)
-                       `^XZ`; // End label format
-    selected_device.send(zplCommand, undefined, errorCallback);
+    const logoCommand = printLogo ? `PUTFILE "fresh.pcx" 0 0\r\n` : ''; // Command to print logo if toggled
+    const cpclCommand = `! 0 200 200 210 1\r\n` + // Start CPCL command
+                        `PAGE-WIDTH 400\r\n` + // Set page width
+                        `DENSITY ${darkness}\r\n` + // Set darkness level
+                        `SPEED ${speed}\r\n` + // Set print speed
+                        logoCommand + // Include logo command if toggled
+                        `BARCODE 50 75 0 1 2 5 "${text}"\r\n` + // Barcode command
+                        `PRINT\r\n`; // Print command
+    selected_device.send(cpclCommand, undefined, errorCallback);
 };
 
 const sendCustomZPL = () => {
