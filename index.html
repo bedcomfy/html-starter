@@ -1,6 +1,33 @@
 <html>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+    }
+    h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+    h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+    .input-group {
+        margin: 10px 0;
+    }
+    .parameter-inputs {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    .parameter-inputs input {
+        margin: 5px;
+    }
+</style>
 <script type="text/javascript" src="../BrowserPrint-3.1.250.min.js"></script>
 <script type="text/javascript">
 let selected_device;
@@ -43,7 +70,7 @@ const printBarcode = (text, darkness, speed, size) => {
                        `^LL300` + // Set label length to 300 dots (3 inches)
                        `^MD${darkness}` + // Set darkness level
                        `^PR${speed}` + // Set print speed
-                       `^FO100,75` + // Centered X position (100 dots), Y position (75 dots)
+                       `^FO50,75` + // Centered X position (50 dots), Y position (75 dots)
                        `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
                        `^FD${text}^FS` + // Field data (barcode content)
                        `^XZ`; // End label format
@@ -74,36 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     barcodeInput.placeholder = 'Enter text';
     document.body.appendChild(barcodeInput);
 
-    const darknessLabel = document.createElement('label');
-    darknessLabel.textContent = 'Darkness (0-100):';
-    document.body.appendChild(darknessLabel);
-    
-    const darknessInput = document.createElement('input');
-    darknessInput.type = 'number';
-    darknessInput.placeholder = '30';
-    darknessInput.value = '30'; // Default darkness
-    document.body.appendChild(darknessInput);
-
-    const speedLabel = document.createElement('label');
-    speedLabel.textContent = 'Speed (1-6):';
-    document.body.appendChild(speedLabel);
-    
-    const speedInput = document.createElement('input');
-    speedInput.type = 'number';
-    speedInput.placeholder = '4';
-    speedInput.value = '4'; // Default speed
-    document.body.appendChild(speedInput);
-
-    const sizeLabel = document.createElement('label');
-    sizeLabel.textContent = 'Size (1-200):';
-    document.body.appendChild(sizeLabel);
-    
-    const sizeInput = document.createElement('input');
-    sizeInput.type = 'number';
-    sizeInput.placeholder = '150';
-    sizeInput.value = '150'; // Default size
-    document.body.appendChild(sizeInput);
-
     const printButton = document.createElement('input');
     printButton.type = 'button';
     printButton.value = 'Print Barcode';
@@ -120,13 +117,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     document.body.appendChild(printButton);
+
+    const darknessLabel = document.createElement('label');
+    darknessLabel.textContent = 'Darkness (0-100):';
+    document.body.appendChild(darknessLabel);
+    
+    const darknessInput = document.createElement('input');
+    darknessInput.type = 'number';
+    darknessInput.placeholder = '70';
+    darknessInput.value = '70'; // Default darkness
+    document.body.appendChild(darknessInput);
+
+    const speedLabel = document.createElement('label');
+    speedLabel.textContent = 'Speed (1-6):';
+    document.body.appendChild(speedLabel);
+    
+    const speedInput = document.createElement('input');
+    speedInput.type = 'number';
+    speedInput.placeholder = '3';
+    speedInput.value = '3'; // Default speed
+    document.body.appendChild(speedInput);
+
+    const sizeLabel = document.createElement('label');
+    sizeLabel.textContent = 'Size (1-200):';
+    document.body.appendChild(sizeLabel);
+    
+    const sizeInput = document.createElement('input');
+    sizeInput.type = 'number';
+    sizeInput.placeholder = '150';
+    sizeInput.value = '150'; // Default size
+    document.body.appendChild(sizeInput);
+
+    const parameterInputs = document.createElement('div');
+    parameterInputs.className = 'parameter-inputs';
+    parameterInputs.appendChild(darknessInput);
+    parameterInputs.appendChild(speedInput);
+    parameterInputs.appendChild(sizeInput);
+    document.body.appendChild(parameterInputs);
 });
 </script>
 </head>
 <body>
 
-<span style="padding-right:50px; font-size:200%">Zebra Browser Print Test Page</span><br/>
-<span style="font-size:75%">This page must be loaded from a web server to function properly.</span><br><br>
+<h1>Zebra Browser Print Test Page</h1>
+<h2>This page must be loaded from a web server to function properly.</h2>
 Selected Device: <select id="selected_device"></select> <br/><br/> 
 <input type="button" value="Get Application Configuration"><br/><br/>
 </body>
