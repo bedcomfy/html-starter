@@ -1,31 +1,31 @@
-const http = require('http');
+export default async function middleware(req) {
+  const { method, url } = req;
 
-const port = 3000;
+  // Middleware to handle CORS
+  const headers = new Headers();
+  headers.set('Access-Control-Allow-Origin', '*'); // Allow all origins
+  headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allow specific methods
+  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
 
-const requestHandler = (req, res) => {
-    // Middleware to handle CORS
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allow specific methods
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
+  // Handle preflight requests
+  if (method === 'OPTIONS') {
+      return new Response(null, {
+          status: 200,
+          headers: headers
+      });
+  }
 
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        res.writeHead(200);
-        res.end();
-        return;
-    }
-
-    if (req.url === '/' && req.method === 'GET') {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end('Hello World!');
-    } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not Found');
-    }
-};
-
-const server = http.createServer(requestHandler);
-
-server.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+  if (url === '/' && method === 'GET') {
+      headers.set('Content-Type', 'text/plain');
+      return new Response('Hello World!', {
+          status: 200,
+          headers: headers
+      });
+  } else {
+      headers.set('Content-Type', 'text/plain');
+      return new Response('Not Found', {
+          status: 404,
+          headers: headers
+      });
+  }
+}
