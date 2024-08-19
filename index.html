@@ -68,7 +68,7 @@ const getConfig = () => {
 };
 
 const printBarcode = (text, darkness, speed, size) => {
-    const logoCommand = printLogo ? `^FO50,10^XFR:fresh.png^FS` : ''; // Command to print logo if toggled
+    const logoCommand = printLogo ? `^FO50,10^XFR:freshlogo.bmp^FS` : ''; // Command to print logo if toggled
     const zplCommand = `^XA` + // Start label format
                        `^PW400` + // Set print width to 400 dots (4 inches)
                        `^LL300` + // Set label length to 300 dots (3 inches)
