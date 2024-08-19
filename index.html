@@ -166,6 +166,12 @@ window.onload = async () => {
     setup();
     loadLogo();
     setupEventListeners(); // Set up all event listeners
+
+    // Create input fields for barcode printing
+    createInputGroup('Enter text for barcode:', 'text', 'barcodeInput', 'Enter text', '');
+    createInputGroup('Darkness (0-100):', 'number', 'darknessInput', '70', '70');
+    createInputGroup('Speed (1-6):', 'number', 'speedInput', '3', '3');
+    createInputGroup('Size (1-200):', 'number', 'sizeInput', '150', '150');
 };
 </script>
 </head>
