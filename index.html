@@ -1,167 +1,118 @@
-<html>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        margin: 20px;
-    }
-    h1 {
-        font-size: 2em;
-        margin-bottom: 10px;
-    }
-    h2 {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-    }
-    .input-group {
-        margin: 10px 0;
-    }
-    .parameter-inputs {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
-    }
-    .parameter-inputs input {
-        margin: 5px;
-    }
-</style>
-<script type="text/javascript" src="../BrowserPrint-3.1.250.min.js"></script>
-<script type="text/javascript">
-let selected_device;
-const devices = [];
-
-const addDeviceToList = (device) => {
-    devices.push(device);
-    const html_select = document.getElementById("selected_device");
-    const option = document.createElement("option");
-    option.text = device.name;
-    option.value = device.uid;
-    html_select.add(option);
-};
-
-const setup = () => {
-    BrowserPrint.getDefaultDevice("printer", device => {
-        selected_device = device;
-        addDeviceToList(device);
-
-        BrowserPrint.getLocalDevices(device_list => {
-            device_list.forEach(device => {
-                if (!selected_device || device.uid !== selected_device.uid) {
-                    addDeviceToList(device);
-                }
-            });
-        }, () => alert("Error getting local devices"), "printer");
-    }, error => alert(error));
-};
-
-const getConfig = () => {
-    BrowserPrint.getApplicationConfiguration(
-        config => alert(JSON.stringify(config)),
-        error => alert(JSON.stringify(new BrowserPrint.ApplicationConfiguration()))
-    );
-};
-
-const printBarcode = (text, darkness, speed, size) => {
-    const zplCommand = `^XA` + // Start label format
-                       `^PW400` + // Set print width to 400 dots (4 inches)
-                       `^LL300` + // Set label length to 300 dots (3 inches)
-                       `^MD${darkness}` + // Set darkness level
-                       `^PR${speed}` + // Set print speed
-                       `^FO50,75` + // Centered X position (50 dots), Y position (75 dots)
-                       `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
-                       `^FD${text}^FS` + // Field data (barcode content)
-                       `^XZ`; // End label format
-    selected_device.send(zplCommand, undefined, errorCallback);
-};
-
-const errorCallback = (errorMessage) => {
-    alert("Error: " + errorMessage);
-};
-
-const onDeviceSelected = (selected) => {
-    selected_device = devices.find(device => selected.value == device.uid);
-};
-
-window.onload = setup;
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
-    document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
-    
-    // New input fields for barcode printing settings with labels
-    const barcodeLabel = document.createElement('label');
-    barcodeLabel.textContent = 'Enter text for barcode:';
-    document.body.appendChild(barcodeLabel);
-    
-    const barcodeInput = document.createElement('input');
-    barcodeInput.type = 'text';
-    barcodeInput.placeholder = 'Enter text';
-    document.body.appendChild(barcodeInput);
-
-    const printButton = document.createElement('input');
-    printButton.type = 'button';
-    printButton.value = 'Print Barcode';
-    printButton.addEventListener('click', () => {
-        const text = barcodeInput.value;
-        const darkness = darknessInput.value;
-        const speed = speedInput.value;
-        const size = sizeInput.value;
-
-        if (text) {
-            printBarcode(text, darkness, speed, size);
-        } else {
-            alert("Please enter text for the barcode.");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Printer</title>
+    <style>
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
-    });
-    document.body.appendChild(printButton);
-
-    const darknessLabel = document.createElement('label');
-    darknessLabel.textContent = 'Darkness (0-100):';
-    document.body.appendChild(darknessLabel);
-    
-    const darknessInput = document.createElement('input');
-    darknessInput.type = 'number';
-    darknessInput.placeholder = '70';
-    darknessInput.value = '70'; // Default darkness
-    document.body.appendChild(darknessInput);
-
-    const speedLabel = document.createElement('label');
-    speedLabel.textContent = 'Speed (1-6):';
-    document.body.appendChild(speedLabel);
-    
-    const speedInput = document.createElement('input');
-    speedInput.type = 'number';
-    speedInput.placeholder = '3';
-    speedInput.value = '3'; // Default speed
-    document.body.appendChild(speedInput);
-
-    const sizeLabel = document.createElement('label');
-    sizeLabel.textContent = 'Size (1-200):';
-    document.body.appendChild(sizeLabel);
-    
-    const sizeInput = document.createElement('input');
-    sizeInput.type = 'number';
-    sizeInput.placeholder = '150';
-    sizeInput.value = '150'; // Default size
-    document.body.appendChild(sizeInput);
-
-    const parameterInputs = document.createElement('div');
-    parameterInputs.className = 'parameter-inputs';
-    parameterInputs.appendChild(darknessInput);
-    parameterInputs.appendChild(speedInput);
-    parameterInputs.appendChild(sizeInput);
-    document.body.appendChild(parameterInputs);
-});
-</script>
+        .input-group label {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
+    <div class="input-group">
+        <label for="text">Text:</label>
+        <input type="text" id="text">
+    </div>
+    <div class="input-group">
+        <label for="darkness">Darkness:</label>
+        <input type="number" id="darkness">
+    </div>
+    <div class="input-group">
+        <label for="speed">Speed:</label>
+        <input type="number" id="speed">
+    </div>
+    <div class="input-group">
+        <label for="size">Size:</label>
+        <input type="number" id="size">
+    </div>
+    <button id="toggle-logo">Fresh Logo</button>
+    <button onclick="printBarcode()">Print Barcode</button>
 
-<h1>Zebra Browser Print Test Page</h1>
-<h2>This page must be loaded from a web server to function properly.</h2>
-Selected Device: <select id="selected_device"></select> <br/><br/> 
-<input type="button" value="Get Application Configuration"><br/><br/>
+    <script>
+        let selected_device;
+        let logoToggled = false;
+
+        document.getElementById("toggle-logo").addEventListener("click", () => {
+            logoToggled = !logoToggled;
+            alert(`Fresh Logo ${logoToggled ? 'enabled' : 'disabled'}`);
+        });
+
+        const addDeviceToList = (device) => {
+            const html_select = document.getElementById("selected_device");
+            const option = document.createElement("option");
+            option.text = device.name;
+            option.value = device.uid;
+            html_select.add(option);
+        };
+
+        const setup = () => {
+            BrowserPrint.getDefaultDevice("printer", device => {
+                selected_device = device;
+                addDeviceToList(device);
+
+                BrowserPrint.getLocalDevices(device_list => {
+                    device_list.forEach(device => {
+                        if (!selected_device || device.uid !== selected_device.uid) {
+                            addDeviceToList(device);
+                        }
+                    });
+                }, () => alert("Error getting local devices"), "printer");
+            }, error => alert(error));
+        };
+
+        const getConfig = () => {
+            BrowserPrint.getApplicationConfiguration(
+                config => alert(JSON.stringify(config)),
+                error => alert(JSON.stringify(new BrowserPrint.ApplicationConfiguration()))
+            );
+        };
+
+        const printBarcode = () => {
+            const text = document.getElementById("text").value;
+            const darkness = document.getElementById("darkness").value;
+            const speed = document.getElementById("speed").value;
+            const size = document.getElementById("size").value;
+
+            let zplCommand = `^XA` + // Start label format
+                             `^PW400` + // Set print width to 400 dots (4 inches)
+                             `^LL300` + // Set label length to 300 dots (3 inches)
+                             `^MD${darkness}` + // Set darkness level
+                             `^PR${speed}` + // Set print speed
+                             `^FO50,75` + // Centered X position (50 dots), Y position (75 dots)
+                             `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
+                             `^FD${text}^FS`; // Field data (barcode content)
+
+            if (logoToggled) {
+                zplCommand += `^FO50,150^GFA,${getLogoData()}^FS`; // Add logo if toggled
+            }
+
+            zplCommand += `^XZ`; // End label format
+
+            selected_device.send(zplCommand, undefined, errorCallback);
+        };
+
+        const getLogoData = () => {
+            // This function should return the ZPL data for the fresh.png logo.
+            // For simplicity, let's assume it returns a placeholder string.
+            return "logo_data_placeholder";
+        };
+
+        const errorCallback = (errorMessage) => {
+            alert("Error: " + errorMessage);
+        };
+
+        const onDeviceSelected = (selected) => {
+            selected_device = devices.find(device => selected.value == device.uid);
+        };
+
+        setup();
+    </script>
 </body>
 </html>
