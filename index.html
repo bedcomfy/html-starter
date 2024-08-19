@@ -37,24 +37,15 @@ const getConfig = () => {
     );
 };
 
-const readCallback = (readData) => {
-    if (!readData) {
-        alert("No Response from Device");
-    } else {
-        alert(readData);
-    }
+const printBarcode = (text) => {
+    const cpclCommand = `! 0 200 200 210 1\r\n` +
+                        `BARCODE 50 1 0 2 2 20 0 "${text}"\r\n` +
+                        `PRINT\r\n`;
+    selected_device.send(cpclCommand, undefined, errorCallback);
 };
 
 const errorCallback = (errorMessage) => {
     alert("Error: " + errorMessage);
-};
-
-const readFromSelectedPrinter = () => {
-    selected_device.read(readCallback, errorCallback);
-};
-
-const getDeviceCallback = (deviceList) => {
-    alert("Devices: \n" + JSON.stringify(deviceList, null, 4));
 };
 
 const onDeviceSelected = (selected) => {
@@ -66,12 +57,25 @@ window.onload = setup;
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
     document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
-    document.querySelector('input[value="Get Status"]').addEventListener('click', () => {
-        writeToSelectedPrinter('~hs');
-        readFromSelectedPrinter();
+    
+    // New input and button for barcode printing
+    const barcodeInput = document.createElement('input');
+    barcodeInput.type = 'text';
+    barcodeInput.placeholder = 'Enter text for barcode';
+    document.body.appendChild(barcodeInput);
+
+    const printButton = document.createElement('input');
+    printButton.type = 'button';
+    printButton.value = 'Print Barcode';
+    printButton.addEventListener('click', () => {
+        const text = barcodeInput.value;
+        if (text) {
+            printBarcode(text);
+        } else {
+            alert("Please enter text for the barcode.");
+        }
     });
-    document.querySelector('input[value="Get Local Devices"]').addEventListener('click', () => BrowserPrint.getLocalDevices(getDeviceCallback, errorCallback));
-    document.querySelector('input[value="Read"]').addEventListener('click', readFromSelectedPrinter);
+    document.body.appendChild(printButton);
 });
 </script>
 </head>
@@ -81,8 +85,5 @@ document.addEventListener('DOMContentLoaded', () => {
 <span style="font-size:75%">This page must be loaded from a web server to function properly.</span><br><br>
 Selected Device: <select id="selected_device"></select> <br/><br/> 
 <input type="button" value="Get Application Configuration"><br/><br/>
-<input type="button" value="Get Status"><br/><br/>
-<input type="button" value="Get Local Devices"><br/><br/>
-<input type="button" value="Read"><br/><br/>
 </body>
 </html>
