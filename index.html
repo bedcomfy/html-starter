@@ -67,6 +67,11 @@ const getConfig = () => {
     );
 };
 
+const loadLogo = () => {
+    const logoCommand = `^XA^XFRESHLOGO.BMP^FS^XZ`; // Load the image into memory
+    selected_device.send(logoCommand, undefined, errorCallback);
+};
+
 const printBarcode = (text, darkness, speed, size) => {
     const logoCommand = printLogo ? `^FO50,10^XFR:freshlogo.bmp^FS` : ''; // Command to print logo if toggled
     const zplCommand = `^XA` + // Start label format
@@ -95,7 +100,10 @@ const toggleLogo = () => {
     alert(`Fresh Logo will ${printLogo ? 'be printed' : 'not be printed'}.`);
 };
 
-window.onload = setup;
+window.onload = () => {
+    setup();
+    loadLogo(); // Load the logo into printer memory on page load
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
