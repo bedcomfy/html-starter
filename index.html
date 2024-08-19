@@ -16,18 +16,7 @@
         margin-bottom: 20px;
     }
     .input-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         margin: 10px 0;
-    }
-    .input-group label {
-        margin-right: 10px;
-    }
-    .parameter-inputs {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
     }
     textarea {
         width: 80%;
@@ -38,61 +27,22 @@
 <script type="text/javascript" src="../BrowserPrint-3.1.250.min.js"></script>
 <script type="text/javascript">
 let selected_device;
-const devices = [];
-let printLogo = false; // State to track whether to print the logo
-let amazonFreshLogoZPL = ''; // Variable to hold the logo ZPL
-
-const addDeviceToList = (device) => {
-    devices.push(device);
-    const html_select = document.getElementById("selected_device");
-    const option = document.createElement("option");
-    option.text = device.name;
-    option.value = device.uid;
-    html_select.add(option);
-};
 
 const setup = () => {
     BrowserPrint.getDefaultDevice("printer", device => {
         selected_device = device;
-        addDeviceToList(device);
-
-        BrowserPrint.getLocalDevices(device_list => {
-            device_list.forEach(device => {
-                if (!selected_device || device.uid !== selected_device.uid) {
-                    addDeviceToList(device);
-                }
-            });
-        }, () => alert("Error getting local devices"), "printer");
+        document.getElementById("selected_device").textContent = device.name;
     }, error => alert(error));
 };
 
-const getConfig = () => {
-    BrowserPrint.getApplicationConfiguration(
-        config => alert(JSON.stringify(config)),
-        error => alert(JSON.stringify(new BrowserPrint.ApplicationConfiguration()))
-    );
-};
-
-const loadLogoZPL = async () => {
-    try {
-        const response = await fetch('amazonFreshLogo.zpl');
-        if (!response.ok) throw new Error('Network response was not ok');
-        amazonFreshLogoZPL = await response.text();
-    } catch (error) {
-        console.error('Error loading logo ZPL:', error);
+const printBarcode = () => {
+    const text = document.getElementById('barcodeInput').value;
+    if (text) {
+        const zplCommand = `^XA^FO50,50^BY2,3.0^BCN,100,Y,N,N^FD${text}^FS^XZ`;
+        selected_device.send(zplCommand, undefined, errorCallback);
+    } else {
+        alert("Please enter text for the barcode.");
     }
-};
-
-const loadLogo = () => {
-    const logoCommand = `^XA^FO50,50^XFR:FRESH.PCX^FS^XZ`;
-    selected_device.send(logoCommand, undefined, errorCallback);
-};
-
-const printBarcode = (text) => {
-    const zplCommand = `^XA^PW400^LL300^MD100^PR3` +
-                       (printLogo ? amazonFreshLogoZPL : '') +
-                       `^FO0,0^BCN,100,Y,N,N,N,D^FD${text}^FS^XZ`;
-    selected_device.send(zplCommand, undefined, errorCallback);
 };
 
 const sendCustomZPL = () => {
@@ -104,86 +54,31 @@ const errorCallback = (errorMessage) => {
     alert("Error: " + errorMessage);
 };
 
-const onDeviceSelected = (selected) => {
-    selected_device = devices.find(device => selected.value == device.uid);
-};
-
-const toggleLogo = () => {
-    printLogo = !printLogo;
-    alert(`Fresh Logo will ${printLogo ? 'be printed' : 'not be printed'}.`);
-};
-
-const createInputGroup = (labelText, inputType, inputId, placeholder, defaultValue) => {
-    const inputGroup = document.createElement('div');
-    inputGroup.className = 'input-group';
-    inputGroup.innerHTML = `
-        <label>${labelText}</label>
-        <input type="${inputType}" placeholder="${placeholder}" value="${defaultValue}" id="${inputId}">
-    `;
-    document.body.appendChild(inputGroup);
-};
-
-const setupEventListeners = () => {
-    document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
-    document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
-    
-    const printButton = document.createElement('input');
-    printButton.type = 'button';
-    printButton.value = 'Print Barcode';
-    printButton.addEventListener('click', () => {
-        const text = document.getElementById('barcodeInput').value;
-        if (text) {
-            printBarcode(text);
-        } else {
-            alert("Please enter text for the barcode.");
-        }
-    });
-    document.body.appendChild(printButton);
-
-    const logoToggle = document.getElementById('logoToggle');
-    logoToggle.addEventListener('change', () => {
-        printLogo = logoToggle.checked;
-    });
-
-    const customZPLLabel = document.createElement('label');
-    customZPLLabel.textContent = 'Enter Custom ZPL Command:';
-    document.body.appendChild(customZPLLabel);
-
-    const customZPLInput = document.createElement('textarea');
-    customZPLInput.id = 'customZPLInput';
-    customZPLInput.placeholder = 'Enter your ZPL command here...';
-    document.body.appendChild(customZPLInput);
-
-    const sendZPLButton = document.createElement('input');
-    sendZPLButton.type = 'button';
-    sendZPLButton.value = 'Send ZPL Command';
-    sendZPLButton.addEventListener('click', sendCustomZPL);
-    document.body.appendChild(sendZPLButton);
-};
-
-window.onload = async () => {
-    await loadLogoZPL(); // Load the logo ZPL when the page loads
+window.onload = () => {
     setup();
-    loadLogo();
-    setupEventListeners(); // Set up all event listeners
-
-    // Create input fields for barcode printing
-    createInputGroup('Enter text for barcode:', 'text', 'barcodeInput', 'Enter text', '');
-    createInputGroup('Darkness (0-100):', 'number', 'darknessInput', '70', '70');
-    createInputGroup('Speed (1-6):', 'number', 'speedInput', '3', '3');
-    createInputGroup('Size (1-200):', 'number', 'sizeInput', '150', '150');
+    document.getElementById('printButton').addEventListener('click', printBarcode);
+    document.getElementById('sendZPLButton').addEventListener('click', sendCustomZPL);
 };
 </script>
 </head>
 <body>
     <h1>Zebra Browser Print Test Page</h1>
     <h2>This page must be loaded from a web server to function properly.</h2>
-    Selected Device: <select id="selected_device"></select> <br/><br/> 
-    <input type="button" value="Get Application Configuration"><br/><br/>
+    <p>Selected Device: <span id="selected_device"></span></p>
 
-    <!-- Checkbox for toggling the Fresh Logo -->
-    <label>
-        <input type="checkbox" id="logoToggle"> Print Fresh Logo
-    </label>
+    <div class="input-group">
+        <label for="barcodeInput">Enter text for barcode:</label>
+        <input type="text" id="barcodeInput" placeholder="Enter text">
+    </div>
+
+    <div class="input-group">
+        <label for="customZPLInput">Enter Custom ZPL Command:</label>
+        <textarea id="customZPLInput" placeholder="Enter your ZPL command here..."></textarea>
+    </div>
+
+    <div class="input-group">
+        <button id="printButton">Print Barcode</button>
+        <button id="sendZPLButton">Send ZPL Command</button>
+    </div>
 </body>
 </html>
