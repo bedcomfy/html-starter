@@ -15,17 +15,19 @@ export default async function middleware(req) {
       });
   }
 
+  // Handle GET request to the root URL
   if (url === '/' && method === 'GET') {
       headers.set('Content-Type', 'text/plain');
       return new Response('Hello World!', {
           status: 200,
           headers: headers
       });
-  } else {
-      headers.set('Content-Type', 'text/plain');
-      return new Response('Not Found', {
-          status: 404,
-          headers: headers
-      });
   }
+
+  // Handle other routes
+  headers.set('Content-Type', 'text/plain');
+  return new Response('Not Found', {
+      status: 404,
+      headers: headers
+  });
 }
