@@ -64,27 +64,43 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
     document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
     
-    // New input fields for barcode printing settings
+    // New input fields for barcode printing settings with labels
+    const barcodeLabel = document.createElement('label');
+    barcodeLabel.textContent = 'Enter text for barcode:';
+    document.body.appendChild(barcodeLabel);
+    
     const barcodeInput = document.createElement('input');
     barcodeInput.type = 'text';
-    barcodeInput.placeholder = 'Enter text for barcode';
+    barcodeInput.placeholder = 'Enter text';
     document.body.appendChild(barcodeInput);
 
+    const darknessLabel = document.createElement('label');
+    darknessLabel.textContent = 'Darkness (0-100):';
+    document.body.appendChild(darknessLabel);
+    
     const darknessInput = document.createElement('input');
     darknessInput.type = 'number';
-    darknessInput.placeholder = 'Darkness (0-100)';
+    darknessInput.placeholder = '30';
     darknessInput.value = '30'; // Default darkness
     document.body.appendChild(darknessInput);
 
+    const speedLabel = document.createElement('label');
+    speedLabel.textContent = 'Speed (1-6):';
+    document.body.appendChild(speedLabel);
+    
     const speedInput = document.createElement('input');
     speedInput.type = 'number';
-    speedInput.placeholder = 'Speed (1-6)';
+    speedInput.placeholder = '4';
     speedInput.value = '4'; // Default speed
     document.body.appendChild(speedInput);
 
+    const sizeLabel = document.createElement('label');
+    sizeLabel.textContent = 'Size (1-200):';
+    document.body.appendChild(sizeLabel);
+    
     const sizeInput = document.createElement('input');
     sizeInput.type = 'number';
-    sizeInput.placeholder = 'Size (1-200)';
+    sizeInput.placeholder = '150';
     sizeInput.value = '150'; // Default size
     document.body.appendChild(sizeInput);
 
