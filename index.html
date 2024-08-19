@@ -40,7 +40,7 @@ const getConfig = () => {
 const printBarcode = (text) => {
     const zplCommand = `^XA` + // Start label format
                        `^FO50,50` + // Field origin (x,y)
-                       `^BCN,100,Y,N,N,N,D` + // Barcode type Code128, height 100
+                       `^BCN,150,Y,N,N,N,D` + // Barcode type Code128, height 150
                        `^FD${text}^FS` + // Field data (barcode content)
                        `^XZ`; // End label format
     selected_device.send(zplCommand, undefined, errorCallback);
