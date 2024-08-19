@@ -3,15 +3,21 @@ document.addEventListener('DOMContentLoaded', function() {
     BrowserPrint.getLocalDevices(function(devices) {
         console.log('Devices detected:', devices);
         const printerSelect = document.getElementById('printerSelect');
-        devices.forEach(device => {
-            if (device.deviceType === 'printer') {
-                console.log('Printer detected:', device);
-                const option = document.createElement('option');
-                option.value = device.uid;
-                option.textContent = device.name;
-                printerSelect.appendChild(option);
-            }
-        });
+        
+        // Check if devices is an array
+        if (Array.isArray(devices)) {
+            devices.forEach(device => {
+                if (device.deviceType === 'printer') {
+                    console.log('Printer detected:', device);
+                    const option = document.createElement('option');
+                    option.value = device.uid;
+                    option.textContent = device.name;
+                    printerSelect.appendChild(option);
+                }
+            });
+        } else {
+            console.error('Devices is not an array:', devices);
+        }
     }, function(error) {
         console.error('Error getting devices:', error);
     });
