@@ -37,10 +37,14 @@ const getConfig = () => {
     );
 };
 
-const printBarcode = (text) => {
+const printBarcode = (text, darkness, speed, size) => {
     const zplCommand = `^XA` + // Start label format
-                       `^FO50,50` + // Field origin (x,y)
-                       `^BCN,150,Y,N,N,N,D` + // Barcode type Code128, height 150
+                       `^PW400` + // Set print width to 400 dots (4 inches)
+                       `^LL300` + // Set label length to 300 dots (3 inches)
+                       `^MD${darkness}` + // Set darkness level
+                       `^PR${speed}` + // Set print speed
+                       `^FO100,75` + // Centered X position (100 dots), Y position (75 dots)
+                       `^BCN,${size},Y,N,N,N,D` + // Barcode type Code128, height based on user input
                        `^FD${text}^FS` + // Field data (barcode content)
                        `^XZ`; // End label format
     selected_device.send(zplCommand, undefined, errorCallback);
@@ -60,19 +64,41 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected_device').addEventListener('change', (event) => onDeviceSelected(event.target));
     document.querySelector('input[value="Get Application Configuration"]').addEventListener('click', getConfig);
     
-    // New input and button for barcode printing
+    // New input fields for barcode printing settings
     const barcodeInput = document.createElement('input');
     barcodeInput.type = 'text';
     barcodeInput.placeholder = 'Enter text for barcode';
     document.body.appendChild(barcodeInput);
+
+    const darknessInput = document.createElement('input');
+    darknessInput.type = 'number';
+    darknessInput.placeholder = 'Darkness (0-100)';
+    darknessInput.value = '30'; // Default darkness
+    document.body.appendChild(darknessInput);
+
+    const speedInput = document.createElement('input');
+    speedInput.type = 'number';
+    speedInput.placeholder = 'Speed (1-6)';
+    speedInput.value = '4'; // Default speed
+    document.body.appendChild(speedInput);
+
+    const sizeInput = document.createElement('input');
+    sizeInput.type = 'number';
+    sizeInput.placeholder = 'Size (1-200)';
+    sizeInput.value = '150'; // Default size
+    document.body.appendChild(sizeInput);
 
     const printButton = document.createElement('input');
     printButton.type = 'button';
     printButton.value = 'Print Barcode';
     printButton.addEventListener('click', () => {
         const text = barcodeInput.value;
+        const darkness = darknessInput.value;
+        const speed = speedInput.value;
+        const size = sizeInput.value;
+
         if (text) {
-            printBarcode(text);
+            printBarcode(text, darkness, speed, size);
         } else {
             alert("Please enter text for the barcode.");
         }
