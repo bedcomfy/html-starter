@@ -29,6 +29,11 @@
         flex-direction: column;
         align-items: center;
     }
+    textarea {
+        width: 80%;
+        height: 100px;
+        margin: 10px 0;
+    }
 </style>
 <script type="text/javascript" src="../BrowserPrint-3.1.250.min.js"></script>
 <script type="text/javascript">
@@ -85,6 +90,11 @@ const printBarcode = (text, darkness, speed, size) => {
                        `^FD${text}^FS` + // Field data (barcode content)
                        `^XZ`; // End label format
     selected_device.send(zplCommand, undefined, errorCallback);
+};
+
+const sendCustomZPL = () => {
+    const customZPL = document.getElementById('customZPLInput').value;
+    selected_device.send(customZPL, undefined, errorCallback);
 };
 
 const errorCallback = (errorMessage) => {
@@ -167,6 +177,22 @@ document.addEventListener('DOMContentLoaded', () => {
     logoButton.value = 'Toggle Fresh Logo';
     logoButton.addEventListener('click', toggleLogo);
     document.body.appendChild(logoButton);
+
+    // New input area for custom ZPL commands
+    const customZPLLabel = document.createElement('label');
+    customZPLLabel.textContent = 'Enter Custom ZPL Command:';
+    document.body.appendChild(customZPLLabel);
+    
+    const customZPLInput = document.createElement('textarea');
+    customZPLInput.id = 'customZPLInput';
+    customZPLInput.placeholder = 'Enter your ZPL command here...';
+    document.body.appendChild(customZPLInput);
+
+    const sendZPLButton = document.createElement('input');
+    sendZPLButton.type = 'button';
+    sendZPLButton.value = 'Send ZPL Command';
+    sendZPLButton.addEventListener('click', sendCustomZPL);
+    document.body.appendChild(sendZPLButton);
 });
 </script>
 </head>
